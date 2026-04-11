@@ -1,0 +1,40 @@
+{
+  "recenttracks": {
+    "track": [
+      {
+        "artist": { "mbid": "", "#text": "Naam Sujal" },
+        "streamable": "0",
+        "image": [
+          {
+            "size": "small",
+            "#text": "https:\/\/lastfm.freetls.fastly.net\/i\/u\/34s\/0b91ecb2e25cbd7c00b5e6523f4000c2.jpg"
+          },
+          {
+            "size": "medium",
+            "#text": "https:\/\/lastfm.freetls.fastly.net\/i\/u\/64s\/0b91ecb2e25cbd7c00b5e6523f4000c2.jpg"
+          },
+          {
+            "size": "large",
+            "#text": "https:\/\/lastfm.freetls.fastly.net\/i\/u\/174s\/0b91ecb2e25cbd7c00b5e6523f4000c2.jpg"
+          },
+          {
+            "size": "extralarge",
+            "#text": "https:\/\/lastfm.freetls.fastly.net\/i\/u\/300x300\/0b91ecb2e25cbd7c00b5e6523f4000c2.jpg"
+          }
+        ],
+        "mbid": "",
+        "album": { "mbid": "", "#text": "MAMAFICATION" },
+        "name": "Mula Pesha",
+        "url": "https:\/\/www.last.fm\/music\/Naam+Sujal\/_\/Mula+Pesha",
+        "date": { "uts": "1775899845", "#text": "11 Apr 2026, 09:30" }
+      }
+    ],
+    "@attr": {
+      "user": "I_M_NightMare",
+      "totalPages": "18",
+      "page": "1",
+      "perPage": "1",
+      "total": "18"
+    }
+  }
+}
