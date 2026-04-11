@@ -22,13 +22,12 @@ import org.springframework.stereotype.Component;
 public class CardRenderer {
 
     private void drawImageCentered(
-        Graphics2D g,
-        BufferedImage img,
-        int cx,
-        int cy,
-        int width,
-        int height
-    ) {
+            Graphics2D g,
+            BufferedImage img,
+            int cx,
+            int cy,
+            int width,
+            int height) {
         int x = cx - width / 2;
         int y = cy - height / 2;
         g.drawImage(img, x, y, width, height, null);
@@ -37,28 +36,23 @@ public class CardRenderer {
     public byte[] render(TrackInfo trackInfo) {
         try {
             BufferedImage image = new BufferedImage(
-                800,
-                1200,
-                BufferedImage.TYPE_INT_RGB
-            );
+                    800,
+                    1200,
+                    BufferedImage.TYPE_INT_RGB);
             Graphics2D g = image.createGraphics();
 
             g.setRenderingHint(
-                RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON
-            );
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(
-                RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-            );
+                    RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             g.setRenderingHint(
-                RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY
-            );
+                    RenderingHints.KEY_RENDERING,
+                    RenderingHints.VALUE_RENDER_QUALITY);
             g.setRenderingHint(
-                RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BICUBIC
-            );
+                    RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 
             // album art
             URL imageUrl = new URL(trackInfo.getArtworkUrl());
@@ -94,12 +88,10 @@ public class CardRenderer {
 
             // track name
             InputStream boldStream = getClass().getResourceAsStream(
-                "/fonts/Inter_28pt-SemiBold.ttf"
-            );
+                    "/fonts/Inter_28pt-SemiBold.ttf");
             Font interBoldBase = Font.createFont(
-                Font.TRUETYPE_FONT,
-                boldStream
-            );
+                    Font.TRUETYPE_FONT,
+                    boldStream);
             Font interBold = interBoldBase.deriveFont(Font.PLAIN, 56f); // PLAIN here — weight is in the file
 
             g.setColor(Color.WHITE);
@@ -109,8 +101,7 @@ public class CardRenderer {
             // artist name
             // Load once — ideally cache this as a field or bean
             InputStream fontStream = getClass().getResourceAsStream(
-                "/fonts/Inter_28pt-Regular.ttf"
-            );
+                    "/fonts/Inter_28pt-Regular.ttf");
             Font interBase = Font.createFont(Font.TRUETYPE_FONT, fontStream);
 
             // Derive at the size you need
@@ -134,20 +125,15 @@ public class CardRenderer {
             // controls
             // Load once, cache these as fields
             BufferedImage imgShuffle = ImageIO.read(
-                getClass().getResourceAsStream("/icons/Shuffle.png")
-            );
+                    getClass().getResourceAsStream("/icons/Shuffle.png"));
             BufferedImage imgPrev = ImageIO.read(
-                getClass().getResourceAsStream("/icons/Prev.png")
-            );
+                    getClass().getResourceAsStream("/icons/Prev.png"));
             BufferedImage imgPause = ImageIO.read(
-                getClass().getResourceAsStream("/icons/PauseButton.png")
-            );
+                    getClass().getResourceAsStream("/icons/PauseButton.png"));
             BufferedImage imgNext = ImageIO.read(
-                getClass().getResourceAsStream("/icons/Next.png")
-            );
+                    getClass().getResourceAsStream("/icons/Next.png"));
             BufferedImage imgLoop = ImageIO.read(
-                getClass().getResourceAsStream("/icons/Loop.png")
-            );
+                    getClass().getResourceAsStream("/icons/Loop.png"));
 
             g.setColor(new Color(179, 179, 179));
             drawImageCentered(g, imgShuffle, 63, 1100, 55, 55);
