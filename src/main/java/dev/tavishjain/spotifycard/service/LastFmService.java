@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.tavishjain.spotifycard.client.LastFmClient;
 import dev.tavishjain.spotifycard.model.TrackInfo;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 
 @Service
 public class LastFmService {
@@ -15,6 +16,7 @@ public class LastFmService {
         this.lastFmClient = lastFmClient;
     }
 
+    @Cacheable(value = "trackInfo", key = "#username")
     public TrackInfo getTrackInfo(String username) {
         String nowPlayingJson = lastFmClient.getNowPlaying(username);
 
@@ -23,32 +25,31 @@ public class LastFmService {
             JsonNode root = mapper.readTree(nowPlayingJson);
 
             String trackName = root
-                .get("recenttracks")
-                .get("track")
-                .get(0)
-                .get("name")
-                .asText();
+                    .get("recenttracks")
+                    .get("track")
+                    .get(0)
+                    .get("name")
+                    .asText();
             String artistName = root
-                .get("recenttracks")
-                .get("track")
-                .get(0)
-                .get("artist")
-                .get("#text")
-                .asText();
+                    .get("recenttracks")
+                    .get("track")
+                    .get(0)
+                    .get("artist")
+                    .get("#text")
+                    .asText();
             String artworkUrl = root
-                .get("recenttracks")
-                .get("track")
-                .get(0)
-                .get("image")
-                .get(3)
-                .get("#text")
-                .asText();
+                    .get("recenttracks")
+                    .get("track")
+                    .get(0)
+                    .get("image")
+                    .get(3)
+                    .get("#text")
+                    .asText();
 
             TrackInfo trackInfo = new TrackInfo(
-                trackName,
-                artistName,
-                artworkUrl
-            );
+                    trackName,
+                    artistName,
+                    artworkUrl);
             return trackInfo;
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse Last.fm response", e);
