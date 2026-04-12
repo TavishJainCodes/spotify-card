@@ -5,6 +5,8 @@ import dev.tavishjain.spotifycard.renderer.CardRenderer;
 import dev.tavishjain.spotifycard.service.LastFmService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 public class CardController {
@@ -13,9 +15,8 @@ public class CardController {
     private final CardRenderer cardRenderer;
 
     public CardController(
-        LastFmService lastFmService,
-        CardRenderer cardRenderer
-    ) {
+            LastFmService lastFmService,
+            CardRenderer cardRenderer) {
         this.lastFmService = lastFmService;
         this.cardRenderer = cardRenderer;
     }
@@ -33,7 +34,18 @@ public class CardController {
         byte[] card = cardRenderer.render(trackInfo);
 
         return ResponseEntity.ok()
-            .header("Content-Type", "image/png")
-            .body(card);
+                .header("Content-Type", "image/png")
+                .body(card);
+    }
+
+    @GetMapping("/api/card/search")
+    public ResponseEntity<byte[]> getSearchCardRender(@RequestParam String trackName, @RequestParam String artworkUrl) {
+        TrackInfo trackInfo = lastFmService.getSearch(trackName, artworkUrl);
+
+        byte[] card = cardRenderer.render(trackInfo);
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "image/png")
+                .body(card);
     }
 }
