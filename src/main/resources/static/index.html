@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Card Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1e1e1e;
+      --accent: #c8f135;
+      --accent-dim: rgba(200, 241, 53, 0.12);
+      --text: #f0f0f0;
+      --muted: #555;
+      --card-w: 380px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px 100px;
+    }
+
+    /* noise grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .wrap { position: relative; z-index: 1; width: 100%; max-width: 640px; }
+
+    header {
+      margin-bottom: 52px;
+      text-align: left;
+    }
+
+    .eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.0;
+      color: var(--text);
+    }
+
+    h1 em {
+      font-style: italic;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .sub {
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 380px;
+      line-height: 1.6;
+    }
+
+    /* Search */
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 40px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      padding: 14px 20px;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]::placeholder { color: var(--muted); }
+    input[type="text"]:focus { border-color: var(--accent); }
+
+    button#searchBtn {
+      background: var(--accent);
+      color: #0a0a0a;
+      border: none;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      padding: 14px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    button#searchBtn:hover { opacity: 0.85; }
+    button#searchBtn:active { transform: scale(0.97); }
+
+    /* Results */
+    .results { display: flex; flex-direction: column; gap: 8px; }
+
+    .result-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .result-item:nth-child(1) { animation-delay: 0.00s; }
+    .result-item:nth-child(2) { animation-delay: 0.05s; }
+    .result-item:nth-child(3) { animation-delay: 0.10s; }
+    .result-item:nth-child(4) { animation-delay: 0.15s; }
+    .result-item:nth-child(5) { animation-delay: 0.20s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-item:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .result-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 4px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--border);
+    }
+
+    .result-thumb.placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .result-info { flex: 1; min-width: 0; }
+
+    .result-track {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+    }
+
+    .result-artist {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .result-arrow {
+      font-size: 18px;
+      color: var(--muted);
+      transition: color 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .result-item:hover .result-arrow {
+      color: var(--accent);
+      transform: translateX(3px);
+    }
+
+    /* Loading */
+    .loading {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+
+    .loading.active { display: flex; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Empty / error */
+    .message {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 40px 0;
+      display: none;
+    }
+
+    .message.active { display: block; }
+
+    /* Generated card preview */
+    #cardPreview {
+      display: none;
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    #cardPreview.active { display: block; }
+
+    #cardPreview p {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    #cardPreview img {
+      max-width: 280px;
+      border-radius: 12px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+      animation: fadeUp 0.4s ease both;
+    }
+
+    #cardPreview a {
+      display: inline-block;
+      margin-top: 16px;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    #cardPreview a:hover { text-decoration: underline; }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 36px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Now Playing</p>
+    <h1>Generate your<br/><em>music card.</em></h1>
+    <p class="sub">Search any song, pick the right one, get a shareable card — no account needed.</p>
+  </header>
+
+  <div class="search-row">
+    <input type="text" id="queryInput" placeholder="Song name, artist…" />
+    <button id="searchBtn">Search</button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <span>Searching…</span>
+  </div>
+
+  <div class="results" id="results"></div>
+  <p class="message" id="message"></p>
+
+  <div id="cardPreview">
+    <p>Your card</p>
+    <img id="cardImg" src="" alt="Generated card" />
+    <br/>
+    <a id="cardDownload" href="" download="card.png">↓ Download PNG</a>
+  </div>
+</div>
+
+<script>
+  const queryInput = document.getElementById('queryInput');
+  const searchBtn  = document.getElementById('searchBtn');
+  const resultsEl  = document.getElementById('results');
+  const loadingEl  = document.getElementById('loading');
+  const messageEl  = document.getElementById('message');
+  const cardPreview = document.getElementById('cardPreview');
+  const cardImg    = document.getElementById('cardImg');
+  const cardDownload = document.getElementById('cardDownload');
+
+  function setLoading(on) {
+    loadingEl.classList.toggle('active', on);
+    searchBtn.disabled = on;
+  }
+
+  function showMessage(msg) {
+    messageEl.textContent = msg;
+    messageEl.classList.add('active');
+  }
+
+  function clearMessage() {
+    messageEl.classList.remove('active');
+  }
+
+  async function search() {
+    const query = queryInput.value.trim();
+    if (!query) return;
+
+    resultsEl.innerHTML = '';
+    cardPreview.classList.remove('active');
+    clearMessage();
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+      const tracks = await res.json();
+
+      if (!tracks || tracks.length === 0) {
+        showMessage('No results found. Try a different search.');
+        return;
+      }
+
+      tracks.forEach(track => {
+        const item = document.createElement('div');
+        item.className = 'result-item';
+
+        // extract hash from artwork URL
+        let artHash = '';
+        if (track.artworkUrl) {
+          const parts = track.artworkUrl.split('/');
+          const filename = parts[parts.length - 1];
+          artHash = filename.replace('.jpg', '').replace('.png', '');
+        }
+
+        const thumbHtml = track.artworkUrl
+          ? `<img class="result-thumb" src="${track.artworkUrl}" alt="" />`
+          : `<div class="result-thumb placeholder">🎵</div>`;
+
+        item.innerHTML = `
+          ${thumbHtml}
+          <div class="result-info">
+            <div class="result-track">${track.trackName}</div>
+            <div class="result-artist">${track.artistName}</div>
+          </div>
+          <span class="result-arrow">→</span>
+        `;
+
+        item.addEventListener('click', () => generateCard(track.trackName, artHash));
+        resultsEl.appendChild(item);
+      });
+
+    } catch (e) {
+      showMessage('Something went wrong. Is the server running?');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function generateCard(trackName, artHash) {
+    cardPreview.classList.remove('active');
+    setLoading(true);
+
+    try {
+      const url = `/api/card/search?trackName=${encodeURIComponent(trackName)}&artworkUrl=${encodeURIComponent(artHash)}`;
+      const res = await fetch(url);
+
+      if (!res.ok) throw new Error('Card generation failed');
+
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+
+      cardImg.src = objectUrl;
+      cardDownload.href = objectUrl;
+      cardPreview.classList.add('active');
+
+      cardPreview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (e) {
+      showMessage('Failed to generate card. Try another track.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  searchBtn.addEventListener('click', search);
+  queryInput.addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
+</script>
+</body>
+</html>
