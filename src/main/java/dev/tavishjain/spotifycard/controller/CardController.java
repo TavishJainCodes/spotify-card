@@ -3,10 +3,11 @@ package dev.tavishjain.spotifycard.controller;
 import dev.tavishjain.spotifycard.model.TrackInfo;
 import dev.tavishjain.spotifycard.renderer.CardRenderer;
 import dev.tavishjain.spotifycard.service.LastFmService;
+
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 public class CardController {
@@ -38,12 +39,17 @@ public class CardController {
                 .body(card);
     }
 
+    @GetMapping("/api/search")
+    public List<TrackInfo> search(@RequestParam String query) {
+        return lastFmService.searchTracks(query);
+    }
+
     @GetMapping("/api/card/search")
-    public ResponseEntity<byte[]> getSearchCardRender(@RequestParam String trackName, @RequestParam String artworkUrl) {
-        TrackInfo trackInfo = lastFmService.getSearch(trackName, artworkUrl);
-
+    public ResponseEntity<byte[]> getSearchCardRender(
+            @RequestParam String trackName,
+            @RequestParam String artistName) {
+        TrackInfo trackInfo = lastFmService.getSearch(trackName, artistName);
         byte[] card = cardRenderer.render(trackInfo);
-
         return ResponseEntity.ok()
                 .header("Content-Type", "image/png")
                 .body(card);

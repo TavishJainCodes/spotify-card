@@ -291,7 +291,7 @@
 
   <div class="search-row">
     <input type="text" id="queryInput" placeholder="Song name, artist…" />
-    <button id="searchBtn">Search</button>
+    <button id="searchBtn" onclick="search()">Search</button>
   </div>
 
   <div class="loading" id="loading">
@@ -377,7 +377,7 @@
           <span class="result-arrow">→</span>
         `;
 
-        item.addEventListener('click', () => generateCard(track.trackName, artHash));
+        item.addEventListener('click', () => generateCard(track.trackName, track.artistName));
         resultsEl.appendChild(item);
       });
 
@@ -388,12 +388,12 @@
     }
   }
 
-  async function generateCard(trackName, artHash) {
+  async function generateCard(trackName, artistName) {
     cardPreview.classList.remove('active');
     setLoading(true);
 
     try {
-      const url = `/api/card/search?trackName=${encodeURIComponent(trackName)}&artworkUrl=${encodeURIComponent(artHash)}`;
+      const url = `/api/card/search?trackName=${encodeURIComponent(trackName)}&artistName=${encodeURIComponent(artistName)}`;
       const res = await fetch(url);
 
       if (!res.ok) throw new Error('Card generation failed');
@@ -411,7 +411,7 @@
     } finally {
       setLoading(false);
     }
-  }
+}
 
   searchBtn.addEventListener('click', search);
   queryInput.addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
