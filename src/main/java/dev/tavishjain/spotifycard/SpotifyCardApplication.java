@@ -9,6 +9,7 @@ import org.springframework.cache.annotation.EnableCaching;
 public class SpotifyCardApplication {
 
     public static void main(String[] args) {
+        System.setProperty("java.awt.headless", "true");
         SpringApplication.run(SpotifyCardApplication.class, args);
     }
 }
